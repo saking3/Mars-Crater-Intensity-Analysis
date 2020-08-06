@@ -9,7 +9,7 @@ To use the code, start by initially running the first portion to get the curve.
 Then, select and run the portion of code that will create the amount of curves 
 you would like the frequency curve to be broken into. 
 
-In progress: finding a way to put the number of curves done into a loop. Calculating Jacobian to plug into minimizer fxn.
+In progress: finding a way to put the number of curves done into a loop. 
 """
 
 #import all the proper packages 
@@ -20,12 +20,13 @@ from osgeo import gdal
 import scipy 
 import seaborn
 from numdifftools import Jacobian
+from statistics import median 
 
 # set working directory 
-os.chdir("C:/Users/Sarah/OneDrive/Reccuring Slope Lineae on Mars/TIFS for Slope Analysis")
+os.chdir("D:/CTX Images")
 
 # read the tiff and make it on object 
-dunetest = gdal.Open("cratertest.tif") #reads tiff 
+dunetest = gdal.Open("E028N-12.tif") #reads tiff 
 
 # convert the tiff to an array and clean out any n/a values
 ar = np.array(dunetest.GetRasterBand(1).ReadAsArray()) 
@@ -33,6 +34,10 @@ ar = ar[~np.isnan(ar)]
 
 #calculate the length of the list
 size = ar.size 
+
+#median of the list 
+median = median(ar)
+print(median)
 
 # make a density curve and plot it 
 pdfplot = seaborn.distplot(ar)
@@ -91,10 +96,15 @@ plt.plot(intensity,f2(bestX))
 plt.show()
 
 #integrate each curve
-area1 = scipy.integrate.quad(f1(bestX), 0, 250)
-area2 = scipy.integrate.quad(f2(bestX), 0, 250)
+area1 = scipy.integrate.simps(f1(bestX), intensity)
+area2 = scipy.integrate.simps(f2(bestX), intensity)
 
-area1 = area1 * 25 
+#max of each curve
+peak1 = max(f1(bestX))
+peak2 = max(f2(bestX))
+
+#area1 = area1 * 25 
+#normalized_intensity <- (area1/(length * 25) ) / median
 
 ################################ 3 CURVES! ################################
 #define Gaussian curves
@@ -144,9 +154,15 @@ plt.plot(intensity,f3(bestX))
 plt.show()
 
 #integrate each curve
-area1 = scipy.integrate.quad(f1(bestX), 0, 250)
-area2 = scipy.integrate.quad(f2(bestX), 0, 250)
-area3 = scipy.integrate.quad(f3(bestX), 0, 250)
+area1 = scipy.integrate.simps(f1(bestX), intensity)
+area2 = scipy.integrate.simps(f2(bestX), intensity)
+area3 = scipy.integrate.simps(f3(bestX), intensity)
+
+#max of each curve
+peak1 = max(f1(bestX))
+peak2 = max(f2(bestX))
+peak3 = max(f3(bestX))
+
 ################################ 4 CURVES! ################################
 #define Gaussian curves
 def f1(X):
@@ -176,7 +192,7 @@ while i < 800:  #setting i to a smaller number will make this faster
     X[4:7] = np.random.randint(0, int(np.amax(intensity)), 4) #mean
     X[8:11] = [10] * 4 #standard deviation    
     #minimize the minimum function
-    hi = scipy.optimize.least_squares(minimum, X, jac = minjac, method = "trf") #least squares
+    hi = scipy.optimize.least_squares(minimum, X, method = "trf") #least squares
     #optimized parameters from the minimization
     X = hi.x
     #if residual sum of squares is better than the min, the X values get saved
@@ -197,11 +213,19 @@ plt.plot(intensity,f3(bestX))
 plt.plot(intensity,f4(bestX))
 plt.show()
 
-#integrate each curve
-area1 = scipy.integrate.quad(f1(bestX), 0, 250)
-area2 = scipy.integrate.quad(f2(bestX), 0, 250)
-area3 = scipy.integrate.quad(f3(bestX), 0, 250)
-area4 = scipy.integrate.quad(f4(bestX), 0, 250)
+#integrate each curve for area
+area1 = scipy.integrate.simps(f1(bestX), intensity)
+area2 = scipy.integrate.simps(f2(bestX), intensity)
+area3 = scipy.integrate.simps(f3(bestX), intensity)
+area4 = scipy.integrate.simps(f4(bestX), intensity)
+
+#norm = ((max1 / area1) / median) *  25
+
+#max of each curve
+peak1 = max(f1(bestX))
+peak2 = max(f2(bestX))
+peak3 = max(f3(bestX))
+peak4 = max(f4(bestX))
 
 ################################ 5 CURVES! ################################
 def f1(X):
@@ -256,8 +280,16 @@ plt.plot(intensity, f5(bestX))
 plt.show()
 
 #integrate each curve
-area1 = scipy.integrate.quad(f1(bestX), 0, 250)
-area2 = scipy.integrate.quad(f2(bestX), 0, 250)
-area3 = scipy.integrate.quad(f3(bestX), 0, 250)
-area4 = scipy.integrate.quad(f4(bestX), 0, 250)
-area5 = scipy.integrate.quad(f5(bestX), 0, 250)
+area1 = scipy.integrate.simps(f1(bestX), intensity)
+area2 = scipy.integrate.simps(f2(bestX), intensity)
+area3 = scipy.integrate.simps(f3(bestX), intensity)
+area4 = scipy.integrate.simps(f4(bestX), intensity)
+area5 = scipy.integrate.simps(f5(bestX), intensity)
+
+#max of each curve
+peak1 = max(f1(bestX))
+peak2 = max(f2(bestX))
+peak3 = max(f3(bestX))
+peak4 = max(f4(bestX))
+peak5 = max(f5(bestX))
+
